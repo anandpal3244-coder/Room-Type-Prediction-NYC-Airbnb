@@ -26,7 +26,16 @@ app.add_middleware(
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 MODEL_PATH = os.path.join(BASE_DIR, "Model_Pipeline.pkl")
-model = joblib.load(MODEL_PATH)
+
+try:
+    print("Loading model...")
+    model = joblib.load(MODEL_PATH)
+    print("Model loaded successfully!")
+    print("Model classes:", model.classes_)
+except Exception as e:
+    print("MODEL LOADING ERROR:")
+    print(repr(e))
+    raise
 
 COLUMNS = [
     "latitude",
