@@ -1,4 +1,4 @@
-const API_URL = "https://room-type-prediction-nyc-airbnb-2.onrender.com"; // change if your FastAPI runs elsewhere
+const API_URL = ""; // change if your FastAPI runs elsewhere
 
 // Order matches model.classes_ (probabilities come back in this order)
 const CLASSES = [

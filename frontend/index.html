@@ -3,90 +3,440 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Room Type Predictor · NYC Airbnb</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap"
+  rel="stylesheet"
+>
+
+<!-- FastAPI serves frontend files through /static -->
+<link rel="stylesheet" href="/static/style.css">
+
 </head>
+
 <body>
+
 <canvas id="bg" aria-hidden="true"></canvas>
 
+
+<!-- =========================
+     HEADER
+========================= -->
+
 <header class="top">
-  <h1>What kind of room<br>is this listing?</h1>
-  <p>Describe a New York Airbnb listing. The model reads the numbers and tells you if it's an entire home, a private room or a shared room.</p>
-  <div class="status" id="status"><i></i><span>Checking API…</span></div>
+
+  <h1>
+    What kind of room<br>
+    is this listing?
+  </h1>
+
+  <p>
+    Describe a New York Airbnb listing.
+    The model reads the numbers and tells you if it's
+    an entire home, a private room or a shared room.
+  </p>
+
+  <div class="status" id="status">
+    <i></i>
+    <span>Checking API…</span>
+  </div>
+
 </header>
 
+
+<!-- =========================
+     MAIN CONTENT
+========================= -->
+
 <main class="grid">
+
+
+  <!-- =========================
+       PREDICTION FORM
+  ========================= -->
+
   <form id="form" class="panel" novalidate>
+
+
+    <!-- PRESETS -->
+
     <div class="presets">
+
       <span>Try an example</span>
-      <button type="button" data-preset="midtown">Midtown apartment</button>
-      <button type="button" data-preset="brooklyn">Brooklyn spare room</button>
-      <button type="button" data-preset="queens">Queens bunk bed</button>
+
+      <button
+        type="button"
+        data-preset="midtown"
+      >
+        Midtown apartment
+      </button>
+
+      <button
+        type="button"
+        data-preset="brooklyn"
+      >
+        Brooklyn spare room
+      </button>
+
+      <button
+        type="button"
+        data-preset="queens"
+      >
+        Queens bunk bed
+      </button>
+
     </div>
 
+
+    <!-- LOCATION -->
+
     <fieldset>
+
       <legend>Where is it?</legend>
-      <div class="chips" id="boroughs"></div>
-      <label class="field wide">Neighbourhood
-        <input id="neighbourhood" name="neighbourhood" list="hoods" placeholder="Start typing, e.g. Williamsburg" autocomplete="off" required>
+
+      <div
+        class="chips"
+        id="boroughs"
+      ></div>
+
+
+      <label class="field wide">
+
+        Neighbourhood
+
+        <input
+          id="neighbourhood"
+          name="neighbourhood"
+          list="hoods"
+          placeholder="Start typing, e.g. Williamsburg"
+          autocomplete="off"
+          required
+        >
+
         <datalist id="hoods"></datalist>
+
       </label>
+
+
       <div class="row">
-        <label class="field">Latitude<input type="number" id="latitude" name="latitude" step="any" min="-90" max="90" required></label>
-        <label class="field">Longitude<input type="number" id="longitude" name="longitude" step="any" min="-180" max="180" required></label>
+
+        <label class="field">
+
+          Latitude
+
+          <input
+            type="number"
+            id="latitude"
+            name="latitude"
+            step="any"
+            min="-90"
+            max="90"
+            required
+          >
+
+        </label>
+
+
+        <label class="field">
+
+          Longitude
+
+          <input
+            type="number"
+            id="longitude"
+            name="longitude"
+            step="any"
+            min="-180"
+            max="180"
+            required
+          >
+
+        </label>
+
       </div>
+
     </fieldset>
 
+
+    <!-- BOOKING DETAILS -->
+
     <fieldset>
+
       <legend>Booking details</legend>
+
+
       <div class="row">
-        <label class="field">Price per night ($)<input type="number" id="price" name="price" min="1" step="any" required></label>
-        <label class="field">Minimum nights<input type="number" id="minimum_nights" name="minimum_nights" min="1" max="365" step="1" required></label>
+
+        <label class="field">
+
+          Price per night ($)
+
+          <input
+            type="number"
+            id="price"
+            name="price"
+            min="1"
+            step="any"
+            required
+          >
+
+        </label>
+
+
+        <label class="field">
+
+          Minimum nights
+
+          <input
+            type="number"
+            id="minimum_nights"
+            name="minimum_nights"
+            min="1"
+            max="365"
+            step="1"
+            required
+          >
+
+        </label>
+
       </div>
-      <label class="field wide">Days available this year
-        <div class="range"><input type="range" id="availability_365" name="availability_365" min="0" max="365" value="180"><output id="availOut">180</output></div>
+
+
+      <label class="field wide">
+
+        Days available this year
+
+        <div class="range">
+
+          <input
+            type="range"
+            id="availability_365"
+            name="availability_365"
+            min="0"
+            max="365"
+            value="180"
+          >
+
+          <output id="availOut">180</output>
+
+        </div>
+
       </label>
+
     </fieldset>
+
+
+    <!-- REVIEWS AND HOST -->
 
     <fieldset>
+
       <legend>Reviews and host</legend>
+
+
       <div class="row three">
-        <label class="field">Total reviews<input type="number" id="number_of_reviews" name="number_of_reviews" min="0" step="1" required></label>
-        <label class="field">Reviews per month<input type="number" id="reviews_per_month" name="reviews_per_month" min="0" step="any" required></label>
-        <label class="field">Host's listings<input type="number" id="calculated_host_listings_count" name="calculated_host_listings_count" min="0" step="1" required></label>
+
+        <label class="field">
+
+          Total reviews
+
+          <input
+            type="number"
+            id="number_of_reviews"
+            name="number_of_reviews"
+            min="0"
+            step="1"
+            required
+          >
+
+        </label>
+
+
+        <label class="field">
+
+          Reviews per month
+
+          <input
+            type="number"
+            id="reviews_per_month"
+            name="reviews_per_month"
+            min="0"
+            step="any"
+            required
+          >
+
+        </label>
+
+
+        <label class="field">
+
+          Host's listings
+
+          <input
+            type="number"
+            id="calculated_host_listings_count"
+            name="calculated_host_listings_count"
+            min="0"
+            step="1"
+            required
+          >
+
+        </label>
+
       </div>
+
     </fieldset>
 
-    <p class="error" id="error" role="alert"></p>
-    <button class="go" id="go" type="submit"><span>Predict room type</span><b class="spin"></b></button>
+
+    <!-- ERROR MESSAGE -->
+
+    <p
+      class="error"
+      id="error"
+      role="alert"
+    ></p>
+
+
+    <!-- PREDICT BUTTON -->
+
+    <button
+      class="go"
+      id="go"
+      type="submit"
+    >
+
+      <span>Predict room type</span>
+
+      <b class="spin"></b>
+
+    </button>
+
   </form>
 
+
+  <!-- =========================
+       RIGHT SIDE
+  ========================= -->
+
   <section class="side">
+
+
+    <!-- MAP -->
+
     <div class="panel mapbox">
-      <div class="maphead"><h2>Pick the spot</h2><small>Click the map to set latitude and longitude</small></div>
-      <canvas id="map" width="640" height="460"></canvas>
+
+      <div class="maphead">
+
+        <h2>Pick the spot</h2>
+
+        <small>
+          Click the map to set latitude and longitude
+        </small>
+
+      </div>
+
+
+      <canvas
+        id="map"
+        width="640"
+        height="460"
+      ></canvas>
+
     </div>
 
-    <div class="panel result" id="result" aria-live="polite">
-      <div class="empty" id="empty">
-        <p>Your prediction will show up here.</p>
-        <small>Fill the form, or try an example, then press Predict.</small>
+
+    <!-- RESULT -->
+
+    <div
+      class="panel result"
+      id="result"
+      aria-live="polite"
+    >
+
+
+      <!-- EMPTY STATE -->
+
+      <div
+        class="empty"
+        id="empty"
+      >
+
+        <p>
+          Your prediction will show up here.
+        </p>
+
+        <small>
+          Fill the form, or try an example,
+          then press Predict.
+        </small>
+
       </div>
-      <div class="filled" id="filled" hidden>
+
+
+      <!-- PREDICTION RESULT -->
+
+      <div
+        class="filled"
+        id="filled"
+        hidden
+      >
+
         <div class="verdict">
-          <div class="bullet" id="bullet">A</div>
-          <div><small>Predicted room type</small><h2 id="verdict">—</h2><em id="conf"></em></div>
+
+          <div
+            class="bullet"
+            id="bullet"
+          >
+            A
+          </div>
+
+
+          <div>
+
+            <small>
+              Predicted room type
+            </small>
+
+            <h2 id="verdict">
+              —
+            </h2>
+
+            <em id="conf"></em>
+
+          </div>
+
         </div>
-        <ul class="bars" id="bars"></ul>
+
+
+        <ul
+          class="bars"
+          id="bars"
+        ></ul>
+
       </div>
+
     </div>
+
   </section>
+
 </main>
 
-<footer>Model: scikit-learn pipeline · Served by FastAPI</footer>
-<script src="script.js"></script>
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+  Model: scikit-learn pipeline · Served by FastAPI
+</footer>
+
+
+<!-- FastAPI serves JavaScript through /static -->
+<script src="/static/script.js"></script>
+
 </body>
 </html>
