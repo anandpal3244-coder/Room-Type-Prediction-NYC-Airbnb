@@ -1,17 +1,12 @@
-```python
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from pydantic import BaseModel, Field
+
 import pandas as pd
+from pydantic import BaseModel, Field
 import joblib
 import os
-
-
-# --------------------------------------------------
-# FastAPI
-# --------------------------------------------------
 
 app = FastAPI(
     title="NYC Airbnb Room Type Predictor",
@@ -19,35 +14,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
-
-# --------------------------------------------------
-# CORS
-# --------------------------------------------------
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# --------------------------------------------------
-# Model
-# --------------------------------------------------
-
-MODEL_PATH = os.path.join(
-    os.path.dirname(__file__),
-    "Model_Pipeline.pkl"
-)
-
+MODEL_PATH = os.path.join(BASE_DIR, "Model_Pipeline.pkl")
 model = joblib.load(MODEL_PATH)
-
-
-# --------------------------------------------------
-# Model columns
-# --------------------------------------------------
 
 COLUMNS = [
     "latitude",
@@ -63,75 +40,78 @@ COLUMNS = [
 ]
 
 
-# --------------------------------------------------
-# Input validation
-# --------------------------------------------------
-
 class Features(BaseModel):
+    latitude: float = Field(
+        ..., ge=-90, le=90,
+        description="Latitude coordinate"
+    )
 
-    latitude: float = Field(..., ge=-90, le=90)
+    longitude: float = Field(
+        ..., ge=-180, le=180,
+        description="Longitude coordinate"
+    )
 
-    longitude: float = Field(..., ge=-180, le=180)
-
-    price: float = Field(..., gt=0)
+    price: float = Field(
+        ..., gt=0,
+        description="Price per night, must be positive"
+    )
 
     minimum_nights: int = Field(
-        ...,
-        ge=1,
-        le=365
+        ..., ge=1, le=365,
+        description="Minimum nights required for booking"
     )
 
     number_of_reviews: int = Field(
-        ...,
-        ge=0
+        ..., ge=0,
+        description="Total number of reviews"
     )
 
     reviews_per_month: float = Field(
-        ...,
-        ge=0
+        ..., ge=0,
+        description="Average reviews per month"
     )
 
     calculated_host_listings_count: int = Field(
-        ...,
-        ge=0
+        ..., ge=0,
+        description="Number of listings by this host"
     )
 
     availability_365: int = Field(
-        ...,
-        ge=0,
-        le=365
+        ..., ge=0, le=365,
+        description="Days available out of 365"
     )
 
     neighbourhood_group: str = Field(
-        ...,
-        min_length=1
+        ..., min_length=1,
+        description="Borough or neighbourhood group"
     )
 
     neighbourhood: str = Field(
-        ...,
-        min_length=1
+        ..., min_length=1,
+        description="Specific neighbourhood name"
     )
 
 
-# --------------------------------------------------
-# API health check
-# --------------------------------------------------
+FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
+
+
+@app.get("/")
+def dashboard():
+    return FileResponse(
+        os.path.join(FRONTEND_DIR, "index.html")
+    )
+
 
 @app.get("/api")
-def api_home():
-
+def api_status():
     return {
-        "message": "NYC Airbnb Room Type Predictor API is running"
+        "message": "NYC Airbnb Room Type Predictor API is running",
+        "status": "online"
     }
 
 
-# --------------------------------------------------
-# Prediction
-# --------------------------------------------------
-
 @app.post("/predict")
 def predict(features: Features):
-
     data = features.model_dump()
 
     row = pd.DataFrame(
@@ -140,38 +120,16 @@ def predict(features: Features):
     )
 
     prediction = model.predict(row)
-
     probability = model.predict_proba(row)
 
     return {
-        "Predicted_room_type": prediction.tolist(),
-        "Probability": probability.tolist()
+        "Predicted_room_type": prediction[0],
+        "Probability": probability.tolist()[0]
     }
 
 
-# --------------------------------------------------
-# Serve frontend
-# --------------------------------------------------
-
-frontend_path = os.path.join(
-    os.path.dirname(__file__),
-    "frontend"
-)
-
 app.mount(
     "/static",
-    StaticFiles(directory=frontend_path),
+    StaticFiles(directory=FRONTEND_DIR),
     name="static"
 )
-
-
-@app.get("/")
-def dashboard():
-
-    return FileResponse(
-        os.path.join(
-            frontend_path,
-            "index.html"
-        )
-    )
-```
