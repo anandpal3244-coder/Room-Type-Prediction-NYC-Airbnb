@@ -6,3 +6,10 @@ numpy>=1.26
 joblib>=1.3
 # Your pickle was saved with scikit-learn 1.7.2, so pin the same version
 scikit-learn==1.7.2
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+.env
+.vscode/
