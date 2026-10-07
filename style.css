@@ -1,0 +1,91 @@
+:root{
+  --bg:#080b12; --panel:#101521; --panel2:#161c2c; --line:#242c42;
+  --text:#eef1f8; --muted:#8d97b2;
+  --home:#ff6319; --private:#00b050; --shared:#2d6bff;
+  --accent:#ffc72c;
+  --head:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Instrument Sans",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font:400 16px/1.5 var(--body);min-height:100vh;padding:0 20px 40px}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:-1}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Header — the one orchestrated entrance */
+.top{max-width:1180px;margin:0 auto;padding:56px 0 28px}
+.top h1{font:800 clamp(2.4rem,6vw,4.6rem)/1.02 var(--head);letter-spacing:-.03em;
+  background:linear-gradient(100deg,var(--text) 40%,var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+.top p{max-width:56ch;color:var(--muted);margin-top:16px;animation:rise .9s .15s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+
+.status{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:6px 14px;border:1px solid var(--line);border-radius:99px;font-size:.85rem;color:var(--muted);animation:rise .9s .3s both}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.status.ok i{background:var(--private);box-shadow:0 0 0 0 var(--private);animation:ping 2s infinite}
+.status.bad i{background:#ff4d5e}
+@keyframes ping{70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
+
+.grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;align-items:start}
+.side{display:grid;gap:20px;position:sticky;top:20px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px}
+fieldset{border:0;padding:0;margin-bottom:26px}
+legend{font:700 1.15rem var(--head);margin-bottom:14px}
+
+/* Presets */
+.presets{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:26px}
+.presets span{color:var(--muted);font-size:.85rem;margin-right:4px}
+.presets button,.chips label{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:7px 14px;border-radius:99px;font:500 .88rem var(--body);cursor:pointer;transition:border-color .2s,transform .2s,background .2s}
+.presets button:hover,.chips label:hover{border-color:var(--accent);transform:translateY(-2px)}
+
+/* Borough chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chips input{position:absolute;opacity:0}
+.chips label:has(input:checked){background:var(--accent);border-color:var(--accent);color:#14110a;font-weight:600}
+.chips label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+
+/* Fields */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row.three{grid-template-columns:repeat(3,1fr)}
+.field{display:block;font-size:.85rem;color:var(--muted);font-weight:500}
+.field.wide{margin-bottom:12px}
+.field input:not([type=range]){display:block;width:100%;margin-top:6px;padding:11px 12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--text);font:500 1rem var(--body);transition:border-color .2s,box-shadow .2s}
+.field input:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px #ffc72c26}
+.field input.bad{border-color:#ff4d5e}
+.range{display:flex;align-items:center;gap:14px;margin-top:10px}
+.range output{min-width:3ch;text-align:right;color:var(--text);font:700 1.1rem var(--head)}
+input[type=range]{flex:1;accent-color:var(--accent);height:6px}
+
+/* Submit */
+.go{width:100%;display:flex;justify-content:center;align-items:center;gap:12px;padding:15px;border:0;border-radius:12px;background:var(--accent);color:#14110a;font:700 1.05rem var(--head);cursor:pointer;transition:transform .2s,box-shadow .2s}
+.go:hover{transform:translateY(-2px);box-shadow:0 10px 30px -8px #ffc72c80}
+.go:active{transform:scale(.98)}
+.spin{display:none;width:16px;height:16px;border:3px solid #14110a40;border-top-color:#14110a;border-radius:50%;animation:turn .7s linear infinite}
+.go.loading .spin{display:block}.go.loading{pointer-events:none;opacity:.85}
+@keyframes turn{to{rotate:360deg}}
+.error{color:#ff7b88;font-size:.9rem;min-height:1.3em;margin-bottom:10px}
+
+/* Map */
+.maphead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.maphead h2,.verdict h2{font:700 1.15rem var(--head)}
+small{color:var(--muted)}
+#map{width:100%;height:auto;border-radius:12px;background:#0b0f1a;cursor:crosshair;display:block;border:1px solid var(--line)}
+
+/* Result */
+.result{min-height:150px;overflow:hidden}
+.empty{text-align:center;padding:18px 0}.empty p{font:600 1.05rem var(--head)}
+.verdict{display:flex;align-items:center;gap:18px;margin-bottom:22px}
+.verdict em{font-style:normal;color:var(--muted);font-size:.9rem}
+.bullet{width:76px;height:76px;flex:none;border-radius:50%;display:grid;place-items:center;font:800 2.4rem var(--head);color:#fff;background:var(--c,var(--home));box-shadow:0 0 40px -6px var(--c,var(--home))}
+.filled.show .bullet{animation:pop .7s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{scale:0;rotate:-90deg}to{scale:1;rotate:0}}
+.bars{list-style:none;padding:0;display:grid;gap:14px}
+.bars li{display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:.92rem}
+.bars .track{grid-column:1/-1;height:10px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.bars .fill{height:100%;width:0;background:var(--c);border-radius:99px;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.bars li.top b{color:var(--c)}
+footer{max-width:1180px;margin:36px auto 0;color:var(--muted);font-size:.8rem}
+
+@media (max-width:900px){.grid{grid-template-columns:1fr}.side{position:static}.row.three{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.row,.row.three{grid-template-columns:1fr}.panel{padding:18px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
